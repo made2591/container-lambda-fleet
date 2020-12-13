@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: A boilerplate repository to deploy AWS Lambda over container in AWS
+
+Parameters:
+
+  # Stack reference name to host AWS Lambda containers over ECR registry in AWS
+  ECRStackName:
+    Type: String
+    Description: The name of the stack with repository
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+
+  # A sample microservice Lambda container-based function: you should replicate for each microservice part of the fleet
+  AMicroserviceSample:
+    Type: AWS::Serverless::Function
+    Properties:
+      PackageType: Image
+      ImageUri: 
+        Fn::ImportValue:
+          !Sub "${ECRStackName}-a-microservice-sample"
+      # Events:
+      #   CatchAll:
+      #     Type: Api
+      #     Properties:
+      #       Path: /hello
+      #       Method: GET
+      # Environment:
+      #   Variables:
+      #     PARAM1: VALUE
+    Metadata:
+      DockerTag: go1.x-v1
+      DockerContext: ./a-microservice-sample
+      Dockerfile: Dockerfile
+
+  # # Another sample microservice Lambda container-based function
+  # AnotherMicroserviceSample:
+  #   Type: AWS::Serverless::Function
+  #   Properties:
+  #     PackageType: Image
+  #     ImageUri: 
+  #       Fn::ImportValue:
+  #         !Sub "${ECRStackName}-another-microservice-sample"
+  #     # Events:
+  #     #   CatchAll:
+  #     #     Type: Api
+  #     #     Properties:
+  #     #       Path: /world
+  #     #       Method: GET
+  #     # Environment:
+  #     #   Variables:
+  #     #     PARAM1: VALUE
+  #   Metadata:
+  #     DockerTag: go1.x-v1
+  #     DockerContext: ./another-microservice-sample
+  #     Dockerfile: Dockerfile
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  # AMicroserviceSampleApi:
+  #   Description: "API Gateway endpoint URL for Prod stage for AMicroserviceSample function"
+  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  AMicroserviceSample:
+    Description: "A Microservice Sample ARN"
+    Value: !GetAtt AMicroserviceSample.Arn

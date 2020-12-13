@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: A boilerplate template to host AWS Lambda containers over ECR registry in AWS
+
+Parameters:
+
+  # A sample microservice repository: you should replicate for each microservice part of the fleet
+  AMicroserviceSampleRepositoryName:
+    Type: String
+    Description: The name of the microservice repository
+    Default: a-microservice-sample
+
+  # # A sample microservice repository: you should replicate for each microservice part of the fleet
+  # AnotherMicroserviceSampleRepositoryName:
+  #   Type: String
+  #   Description: The name of another microservice repository
+  #   Default: another-microservice-sample
+
+Resources:
+
+  # A sample microservice repository: you should replicate for each microservice part of the fleet
+  AMicroserviceSampleRepository:
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: !Ref AMicroserviceSampleRepositoryName
+
+  # # A sample microservice repository: you should replicate for each microservice part of the fleet
+  # AnotherMicroserviceSampleRepository:
+  #   Type: AWS::ECR::Repository
+  #   Properties: 
+  #     RepositoryName: !Ref AnotherMicroserviceSampleRepositoryName
+
+Outputs:
+
+  # Output to import name in microservice stacks
+  ContainerLambdaFleetRegistry:
+    Description: The registry URL for the fleet of Lambda
+    Value: !Join [ "", [ !Ref AWS::AccountId, ".dkr.ecr.", !Ref AWS::Region, ".amazonaws.com" ] ]
+    Export:
+      Name: container-lambda-fleet-registry
+
+  # Output to import name in microservice stacks
+  AMicroserviceSampleRepository:
+    Description: A Microservice Sample ECR Repository
+    Value: !Join [ "", [ !Ref AWS::AccountId, ".dkr.ecr.", !Ref AWS::Region, ".amazonaws.com/", !Ref AMicroserviceSampleRepositoryName, ":latest" ] ]
+    Export:
+      Name: !Join [ "-", [container-lambda-fleet, !Ref AMicroserviceSampleRepositoryName]]
+
+  # # Output to import name in microservice stacks
+  # AnotherMicroserviceSampleRepository:
+  #   Description: Another Microservice Sample ECR Repository
+  #   Value: !Join [ "", [ !Ref AWS::AccountId, ".dkr.ecr.", !Ref AWS::Region, ".amazonaws.com/", !Ref AnotherMicroserviceSampleRepositoryName, ":latest" ] ]
+  #   Export:
+  #     Name: !Join [ "-", [container-lambda-fleet, !Ref AnotherMicroserviceSampleRepositoryName]]
